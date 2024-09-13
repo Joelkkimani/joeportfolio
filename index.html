@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joe's Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #0f3460;
+            --text-color: #e94560;
+            --card-size: 200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            font-weight:bolder;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight:bolder;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .skill-card {
+            width: var(--card-size);
+            height: var(--card-size);
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .skill-card-inner {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .skill-card:hover .skill-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .skill-card-front, .skill-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .skill-card-back {
+            transform: rotateY(180deg);
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .contact-form {
+            margin-top: 4rem;
+            background-color: var(--secondary-color);
+            padding: 2rem;
+            font-weight:bolder;
+            border-radius: 10px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contact-form h2 {
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background-color: var(--text-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff6b6b;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color:black;
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* New styles for the bottom container */
+        .bottom-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .bottom-container i {
+            font-size: 1.5rem;
+            font-weight:bolder;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        /* About Me section */
+        .about-me {
+            display: flex;
+            align-items: center;
+            margin-top: 4rem;
+            background-color: var(--secondary-color);
+            padding: 2rem;
+            border-radius: 10px;
+        }
+
+        .about-me img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin-right: 2rem;
+        }
+
+        .about-me-content {
+            flex: 1;
+            font-weight:bolder;
+        }
+
+        /* Project cards */
+        .projects {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 4rem;
+        }
+
+        .project-card {
+            width: calc(20% - 1rem);
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .project-card img {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .preloader-content {
+            text-align: center;
+        }
+
+        .preloader-spinner {
+            border: 10px solid var(--secondary-color);
+            border-top: 30px solid var(--text-color);
+            border-bottom: 30px solid var(--text-color);
+            border-radius: 50%;
+            width: 150px;
+            font-weight:bolder;
+            height: 150px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+                font-weight:bolder;
+            }
+
+            .skills {
+                gap: 1rem;
+            }
+
+            .skill-card {
+                width: calc(var(--card-size) * 0.8);
+                height: calc(var(--card-size) * 0.8);
+            }
+
+            .about-me {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .about-me img {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .project-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader">
+        <div class="preloader-content">
+            <div class="preloader-spinner"></div>
+
+            <button id="next-button" style="font-size:1.5rem; font-weight:bolder;">welcome </button>
+        </div>
+    </div>
+
+    <div id="particles-js"></div>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()"></button>
+    <div class="container">
+       <div class="bottom-container">
+        <i class="fas fa-bars"></i>
+        <i class="fas fa-search"></i>
+    </div>
+        <header>
+            <div>
+                <h1>HELLO AM JOE 👋</h1>
+                <p class="subtitle">Front End developmer & beginner</p>
+            </div>
+        </header>
+        
+            <!-- Skill cards remain unchanged -->
+        </section>
+        <section class="about-me">
+            <img src="joe.jpg" alt="Joe's Profile Picture">
+            <div class="about-me-content">
+                <h2>About Me</h2>
+                <p>Hi, I'm Joe  I love coding and  am still learning new stuff and from Kenya and  my dream is to be a software Engineer.</p>
+            </div>
+        </section>
+        <section class="projects">
+            <div class="project-card">
+                <img src="/image search.jpg" alt="Image search">
+                <h3>Image search</h3>
+                <p>Using unsplash Api created a simple image generator </p>
+            </div>
+            <div class="project-card">
+                <img src="pizzatown.jpg" alt="Pizza town">
+                <h3>Pizza town</h3>
+                <p>This is a simple html and css pizza town website.</p>
+            </div>
+            <div class="project-card">
+                <img src="/Joe cafe.jpg" alt="Joe cafe ">
+                <h3>Joe Cafe</h3>
+                <p>A Cafe and food healthe website .</p>
+            </div>
+            <div class="project-card">
+                <img src="/project beats.jpg" alt="beats ">
+                <h3>Beats </h3>
+                <p>A Beats by dre simple site .</p>
+            </div>
+            <div class="project-card">
+                <img src="frantikie.jpg" alt="Frantikie">
+                <h3>Frantikie</h3>
+                <p>A coffee and food website but am still doing some updates .</p>
+            </div>
+        </section>
+
+        </section>
+    </div>
+            <section class="skills">
+            <div class="skill-card" style="--card-color: #E44D26;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>HTML5</h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #264DE4;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>CSS3</h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #F0DB4F;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>JavaScript</h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #02569B;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" alt="Flutter" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>Flutter</h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #00B4AB;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg" alt="Dart" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>Dart</h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #3776AB;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>Python</h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #007396;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>Java</h3>
+                        <p>Android apps</p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #4479A1;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="SQL" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>SQL</h3>
+                        <p>Databas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="skill-card" style="--card-color: #F05032;">
+                <div class="skill-card-inner">
+                    <div class="skill-card-front">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" width="100">
+                    </div>
+                    <div class="skill-card-back">
+                        <h3>Git</h3>
+                        <p>Version control</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+                <section class="contact-form">
+            <h2>Contact Me</h2>
+            <form id="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+    <footer>
+        <p>&copy; 2024 Joe's Portfolio. All rights reserved.</p>
+    </footer>
+  
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Particle.js configuration
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle", stroke: { width: 0, color: "#000000" }, polygon: { nb_sides: 5 }, image: { src: "img/github.svg", width: 100, height: 100 } },
+                opacity: { value: 0.5, random: false, anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false } },
+                size: { value: 3, random: true, anim: { enable: false, speed: 40, size_min: 0.1, sync: false } },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false, attract: { enable: false, rotateX: 600, rotateY: 1200 } }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
+            },
+            retina_detect: true
+        });
+
+        // 3D animation for skill cards
+        const cards = document.querySelectorAll('.skill-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            });
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // EmailJS configuration (replace with your own EmailJS user ID)
+        (function() {
+            emailjs.init("ZEtljok7KuLXCPKF0");
+        })();
+
+        // Contact form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            emailjs.sendForm('service_afub8e2', 'template_kel5a67', this)
+                .then(function() {
+                    console.log('SUCCESS!');
+                    alert('Message sent successfully!');
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    alert('Failed to send message. Please try again.');
+                });
+        });
+
+        // Animate on scroll
+        window.addEventListener('scroll', () => {
+            const elements = document.querySelectorAll('.skill-card, .contact-form, .about-me, .project-card');
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                if (rect.top < windowHeight) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Initial animation
+        anime({
+            targets: 'header *',
+            translateY: [-50, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(200),
+            easing: 'easeOutQuad',
+            duration: 1000
+        });
+
+        anime({
+            targets: '.skill-card',
+            scale: [0, 1],
+            opacity: [0, 1],
+            delay: anime.stagger(100, {start: 500}),
+            easing: 'easeOutElastic(1, .5)',
+            duration: 1500
+        });
+
+        // Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.querySelector('.preloader');
+            const nextButton = document.getElementById('next-button');
+
+            nextButton.addEventListener('click', () => {
+                preloader.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
